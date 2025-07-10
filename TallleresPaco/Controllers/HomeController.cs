@@ -15,6 +15,7 @@ namespace TallleresPaco.Controllers
 
         public IActionResult Index()
         {
+            
             return View();
         }
 

@@ -17,7 +17,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TallleresPaco.Models;
+using TallleresPaco.Data;
 
 namespace TallleresPaco.Areas.Identity.Pages.Account
 {
@@ -29,13 +33,16 @@ namespace TallleresPaco.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly Contexto _contexto;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            Contexto contexto)
+            
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +50,7 @@ namespace TallleresPaco.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _contexto = contexto;
         }
 
         /// <summary>
@@ -117,6 +125,18 @@ namespace TallleresPaco.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+
+                
+                var nuevaFila = new Usuarios
+                {
+                    
+                    Email = user.Email,
+                    Estado = "Pendiente"
+                    
+                };
+
+                _contexto.Usuarios.Add(nuevaFila);
+                await _contexto.SaveChangesAsync();
 
                 if (result.Succeeded)
                 {
