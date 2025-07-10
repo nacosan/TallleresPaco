@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace T1Alquileres.Models
+namespace TallleresPaco.Models
 {
     [Table("vehiculos")]
     public class Vehiculos
