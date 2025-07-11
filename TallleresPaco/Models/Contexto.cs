@@ -11,7 +11,7 @@ namespace TallleresPaco.Models
         }
 
         public DbSet<Usuarios> Usuarios { get; set; }
-        public DbSet<Vehiculos> Vehiculos { get; set; }
+        public DbSet<Vehiculos> Vehiculos { get; set; } 
         public DbSet<Alquileres> Alquileres { get; set; }
 
         /*protected override void OnModelCreating(ModelBuilder modelBuilder)

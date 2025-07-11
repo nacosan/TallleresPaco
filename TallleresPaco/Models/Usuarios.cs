@@ -13,27 +13,29 @@ namespace TallleresPaco.Models
 
         [Column("nombre")]
         [StringLength(50)]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
 
         [Column("apellido")]
         [StringLength(50)]
-        public string Apellido { get; set; }
+        public string? Apellido { get; set; }
 
         [Column("fecnac")]
-        public DateTime FechaNacimiento { get; set; }
+
+        public DateTime? FechaNacimiento { get; set; }
+
 
         [Column("dni")]
         [StringLength(9)]
-        public string Dni { get; set; }
+        public string? Dni { get; set; }
 
         [Column("email")]
         [StringLength(100)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Column("estado")]
         [StringLength(50)]
-        public string Estado { get; set; }
+        public string? Estado { get; set; }
 
-        public ICollection<Alquileres> Alquileres { get; set; }
+        public ICollection<Alquileres>? Alquileres { get; set; }
     }
 }
