@@ -56,15 +56,22 @@ namespace TallleresPaco.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,FechaNacimiento,Dni,Email,Estado")] Usuarios usuarios)
+        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaNacimiento,Dni,Estado")] UsuarioRegistroViewModel ur)
         {
             if (ModelState.IsValid)
             {
+                Usuarios usuarios = new Usuarios() { 
+                    Nombre = ur.Nombre,
+                    Apellido = ur.Apellido,
+                    FechaNacimiento = ur.FechaNacimiento,
+                    Dni = ur.Dni,
+                    Estado = ur.Estado,
+                };
                 _context.Add(usuarios);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(usuarios);
+            return View(ur);
         }
 
         // GET: Usuarios/Edit/5
@@ -74,49 +81,54 @@ namespace TallleresPaco.Controllers
             {
                 return NotFound();
             }
-            Console.WriteLine(id);
-            var usuarios = await _context.Usuarios.FindAsync(id);
-            if (usuarios == null)
+
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null)
             {
                 return NotFound();
             }
-            return View(usuarios);
-        }
 
+            var vm = new UsuarioRegistroViewModel
+            {
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                FechaNacimiento = usuario.FechaNacimiento,
+                Dni = usuario.Dni,
+                Estado = usuario.Estado
+            };
+
+            return View(vm); 
+        }
         // POST: Usuarios/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,FechaNacimiento,Dni,Email,Estado")] Usuarios usuarios)
+       
+        public async Task<IActionResult> Edit(int id, UsuarioRegistroViewModel vm)
         {
-            if (id != usuarios.Id)
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(usuarios);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsuariosExists(usuarios.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(usuarios);
+            // Actualizar los campos
+            usuario.Nombre = vm.Nombre;
+            usuario.Apellido = vm.Apellido;
+            usuario.FechaNacimiento = vm.FechaNacimiento;
+            usuario.Dni = vm.Dni;
+            usuario.Estado = vm.Estado;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
