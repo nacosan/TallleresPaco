@@ -20,10 +20,10 @@ namespace TallleresPaco.Models
         public int VehiculoId { get; set; }
 
         [Column("fecini")]
-        public DateOnly FechaInicio { get; set; }
+        public DateTime FechaInicio { get; set; }
 
         [Column("fecfin")]
-        public DateOnly FechaFin { get; set; }
+        public DateTime FechaFin { get; set; }
 
         [Column("precio")]
         public decimal Precio { get; set; }

@@ -131,7 +131,8 @@ namespace TallleresPaco.Areas.Identity.Pages.Account
                 {
                     
                     Email = user.Email,
-                    Estado = "Pendiente"
+                    Estado = "Pendiente",
+                    FechaNacimiento = DateTime.Now
                     
                 };
 
