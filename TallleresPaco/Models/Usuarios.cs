@@ -20,7 +20,9 @@ namespace TallleresPaco.Models
         public string? Apellido { get; set; }
 
         [Column("fecnac")]
+
         public DateTime? FechaNacimiento { get; set; }
+
 
         [Column("dni")]
         [StringLength(9)]
