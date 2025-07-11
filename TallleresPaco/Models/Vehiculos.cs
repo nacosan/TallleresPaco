@@ -28,7 +28,7 @@ namespace TallleresPaco.Models
         public string Color { get; set; }
 
         [Column("aniofab")]
-        public DateOnly AnioFab { get; set; }
+        public DateTime AnioFab { get; set; }
 
         [Column("tipo")]
         [StringLength(50)]
