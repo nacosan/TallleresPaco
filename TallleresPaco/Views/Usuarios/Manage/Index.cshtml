@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Panel de Reportes";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Panel de Reportes</h2>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Reporte 1: Consultar Reservas -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Consultar Reservas</h6>
+                    <p class="text-muted small flex-grow-1">Revisa todas tus reservas históricas.</p>
+                    <a asp-controller="Usuarios" asp-action="ConsultarReservas" class="btn btn-outline-primary mt-2">Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte 2: Consultar Reservas Últimos 2 Meses -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Reservas Últimos 2 Meses</h6>
+                    <p class="text-muted small flex-grow-1">Consulta tus reservas más recientes.</p>
+                    <a asp-controller="Usuarios" asp-action="ReservasRecientes" class="btn btn-outline-primary mt-2">Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte 3: Consultar Escudería -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Consultar Escudería</h6>
+                    <p class="text-muted small flex-grow-1">Ver vehículos alquilados por escudería y recuento.</p>
+                    <a asp-controller="Usuarios" asp-action="ReporteEscuderia" class="btn btn-outline-primary mt-2">Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="col-12 mt-3">
+            <hr />
+            <h5 class="text-center text-secondary">Reportes de Administración</h5>
+        </div>
+
+        <!-- Reporte 4: Usuarios Registrados Últimos 2 Meses -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100 bg-light">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Usuarios Nuevos</h6>
+                    <p class="text-muted small flex-grow-1">Lista de usuarios registrados recientemente.</p>
+                    <a asp-controller="Usuarios" asp-action="UsuariosRecientes" class="btn btn-outline-secondary mt-2">Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte 5: Histórico de Alquileres -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100 bg-light">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Histórico de Alquileres</h6>
+                    <p class="text-muted small flex-grow-1">Resumen detallado de alquileres por usuario.</p>
+                    <a asp-controller="Usuarios" asp-action="HistoricoAlquileres" class="btn btn-outline-secondary mt-2">Ver Reporte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte 6: Descargar PDF de Vehículos -->
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card text-center shadow-sm border-0 h-100 bg-light">
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title mb-2">Descargar PDF Vehículos</h6>
+                    <p class="text-muted small flex-grow-1">Exporta todos los vehículos registrados.</p>
+                    <a asp-controller="Usuarios" asp-action="DescargarVehiculosPdf" class="btn btn-outline-danger mt-2">Descargar PDF</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

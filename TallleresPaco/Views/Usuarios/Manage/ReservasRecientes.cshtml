@@ -1,0 +1,40 @@
+﻿@model ReportesViewModel
+
+@{
+    ViewData["Title"] = "Mis Reservas - Últimos 2 meses";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.ReservasUltimosDosMeses == null || !Model.ReservasUltimosDosMeses.Any())
+{
+    <p>No tienes reservas en los últimos dos meses.</p>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Id Alquiler</th>
+                <th>Matrícula Vehículo</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Precio</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reserva in Model.ReservasUltimosDosMeses)
+            {
+                <tr>
+                    <td>@reserva.IdAlquiler</td>
+                    <td>@reserva.VehiculoMatricula</td>
+                    <td>@reserva.FechaInicio.ToString("dd/MM/yyyy")</td>
+                    <td>@reserva.FechaFin.ToString("dd/MM/yyyy")</td>
+                    <td>@reserva.Precio.ToString("C")</td>
+                    <td>@reserva.Estado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

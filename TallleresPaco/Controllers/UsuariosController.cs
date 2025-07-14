@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using TallleresPaco.Models;
 
 namespace TallleresPaco.Controllers
@@ -165,6 +166,151 @@ namespace TallleresPaco.Controllers
         private bool UsuariosExists(int id)
         {
             return _context.Usuarios.Any(e => e.Id == id);
+        }
+        public async Task<IActionResult> Manage()
+        {
+            return View("Manage/Index");
+
+        }
+
+        // 1. Obtener usuarios registrados últimos 2 meses
+        public async Task<IActionResult> UsuariosRecientes()
+        {
+            var dosMesesAtras = DateTime.Now.AddMonths(-2);
+
+            var usuarios = await _context.Usuarios
+                .Where(u => u.FechaNacimiento >= dosMesesAtras && u.Estado == "Activo")
+                .Select(u => new UsuarioReporte
+                {
+                    Id = u.Id,
+                    NombreCompleto = u.Nombre + " " + u.Apellido,
+                    FechaRegistro = u.FechaNacimiento,
+                    Email = u.Email
+                })
+                .ToListAsync();
+
+            var vm = new ReportesViewModel { UsuariosRecientes = usuarios };
+            return View("Manage/UsuariosRecientes", vm);
+        }
+
+        // 2. Histórico de alquileres por usuario
+        public async Task<IActionResult> HistoricoAlquileres()
+        {
+            var historico = await _context.Alquileres
+                .Include(a => a.Usuario) // incluye usuario
+                .Include(a => a.Vehiculo) // incluye vehículo
+                .Select(a => new AlquilerReporte
+                {
+                    IdAlquiler = a.Id,
+                    UsuarioNombre = a.Usuario.Nombre + " " + a.Usuario.Apellido,
+                    VehiculoMatricula = a.Vehiculo.Matricula,
+                    FechaInicio = a.FechaInicio,
+                    FechaFin = a.FechaFin,
+                    Precio = a.Precio,
+                    Estado = a.Estado
+                }).ToListAsync();
+
+            var vm = new ReportesViewModel { HistoricoAlquileres = historico };
+            return View("Manage/HistoricoAlquileres", vm);
+        }
+
+        // 3. Descargar PDF con todos los vehículos (solo paso datos, el PDF se genera en la vista o servicio)
+        public async Task<IActionResult> DescargarVehiculosPdf()
+        {
+            var vehiculos = await _context.Vehiculos
+                .Select(v => new VehiculoReporte
+                {
+                    IdVehiculo = v.Id,
+                    Matricula = v.Matricula,
+                    Modelo = v.Modelo,
+                    Marca = v.Marca,
+                    Color = v.Color,
+                    AnioFab = v.AnioFab,
+                    Precio = v.Precio,
+                    Categoria = v.Categoria
+                }).ToListAsync();
+
+            var vm = new ReportesViewModel { Vehiculos = vehiculos };
+            return View(vm);
+        }
+
+        // 4. Reporte escudería: nombre + total alquileres
+        public async Task<IActionResult> ReporteEscuderia()
+        {
+            var query = await (from a in _context.Alquileres
+                               join v in _context.Vehiculos on a.VehiculoId equals v.Id
+                               group a by v.Marca into g
+                               select new EscuderiaReporte
+                               {
+                                   NombreEscuderia = g.Key,
+                                   TotalAlquileres = g.Count()
+                               }).ToListAsync();
+
+            var vm = new ReportesViewModel { Escuderias = query };
+            return View("Manage/ReporteEscuderia", vm);
+        }
+
+        // 5. Consultar reservas usuario (supongo que id usuario es el logueado, lo puedes ajustar)
+        public async Task<IActionResult> ConsultarReservas()
+        {
+            // Ejemplo con usuario logueado (ajustar con autenticación)
+            var userId = GetLoggedUserId();
+
+            var reservas = await _context.Alquileres
+                .Where(a => a.Id == userId)
+                .Include(a => a.Vehiculo)
+                .Select(a => new AlquilerReporte
+                {
+                    IdAlquiler = a.Id,
+                    UsuarioNombre = "", // no es necesario porque es el usuario actual
+                    VehiculoMatricula = a.Vehiculo.Matricula,
+                    FechaInicio = a.FechaInicio,
+                    FechaFin = a.FechaFin,
+                    Precio = a.Precio,
+                    Estado = a.Estado
+                }).ToListAsync();
+
+            var vm = new ReportesViewModel { ReservasUsuario = reservas };
+            return View("Manage/ConsultarReservas", vm);
+        }
+
+        // 6. Consultar reservas últimos 2 meses (para el usuario logueado)
+        public async Task<IActionResult> ReservasRecientes()
+        {
+            var userId = GetLoggedUserId();
+            var dosMesesAtras = DateTime.Now.AddMonths(-2);
+
+            var reservas = await _context.Alquileres
+                .Where(a => a.Id == userId && a.FechaInicio >= dosMesesAtras)
+                .Include(a => a.Vehiculo)
+                .Select(a => new AlquilerReporte
+                {
+                    IdAlquiler = a.Id,
+                    UsuarioNombre = "", // usuario actual
+                    VehiculoMatricula = a.Vehiculo.Matricula,
+                    FechaInicio = a.FechaInicio,
+                    FechaFin = a.FechaFin,
+                    Precio = a.Precio,
+                    Estado = a.Estado
+                }).ToListAsync();
+
+            var vm = new ReportesViewModel { ReservasUltimosDosMeses = reservas };
+            return View("Manage/ReservasRecientes", vm);
+        }
+
+        // Método auxiliar ficticio para obtener el id de usuario actual (ajustar según auth real)
+        private int GetLoggedUserId()
+        {
+            string mail = User.Identity.Name;
+            int usuId = 0;
+            if (mail != null)
+            {
+                usuId = _context.Usuarios
+                          .Where(u => u.Email == mail)
+                          .Select(u => u.Id )
+                          .FirstOrDefault();
+            }
+            return usuId; 
         }
     }
 }

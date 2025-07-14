@@ -20,3 +20,80 @@ html {
 body {
   margin-bottom: 60px;
 }
+/* Aplica solo a formularios dentro del main content, no en navbar */
+main form {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+    /* Inputs, selects, textareas SOLO dentro del formulario principal */
+    main form input,
+    main form select,
+    main form textarea {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Labels dentro del formulario principal */
+    main form label {
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        display: block;
+    }
+
+    /* Botones de formulario */
+    main form button,
+    main form input[type="submit"] {
+        padding: 0.5rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 0.375rem;
+        border: none;
+    }
+
+    /* Mensajes de validación */
+    main form .field-validation-error {
+        color: #dc3545;
+        font-size: 0.9rem;
+    }
+
+    main form .validation-summary-errors {
+        color: #dc3545;
+        margin-top: 1rem;
+    }
+/* Estilo de tablas solo en el contenido principal */
+main table {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    background-color: #fff;
+    border-collapse: collapse;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+}
+
+    main table thead {
+        background-color: #f1f3f5;
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    main table th,
+    main table td {
+        padding: 0.75rem;
+        text-align: left;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+
+        main table td .btn {
+            margin-right: 0.25rem;
+        }
