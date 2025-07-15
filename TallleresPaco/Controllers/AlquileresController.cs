@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -46,31 +47,44 @@ namespace TallleresPaco.Controllers
         }
 
         // GET: Alquileres/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int? idVehiculo = null)
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre");
-            ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula");
-
+            if (User.IsInRole("Admin"))
+            {
+                ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+                ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula");
+            }
+            else
+            {
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+                ViewData["UsuarioId"] = usuario?.Id;
+                ViewData["VehiculoId"] = idVehiculo;
+            }
             return View();
         }
+
 
         // POST: Alquileres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal,Estado")] Alquileres alquileres)
+        [Authorize]
+        public async Task<IActionResult> Create([Bind("UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal,Estado")] Alquileres alquileres)
         {
-            if (ModelState.IsValid)
+            if (!User.IsInRole("Admin"))
             {
-                _context.Add(alquileres);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var userEmail = User.Identity.Name;
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == userEmail);
+                alquileres.UsuarioId = usuario.Id;
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", alquileres.UsuarioId);
-            ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Id", alquileres.VehiculoId);
-            return View(alquileres);
+
+            _context.Add(alquileres);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
+
 
         // GET: Alquileres/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -103,7 +117,7 @@ namespace TallleresPaco.Controllers
             }
 
 //            if (ModelState.IsValid)
-            {
+            
                 try
                 {
                     _context.Update(alquileres);
@@ -121,7 +135,7 @@ namespace TallleresPaco.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre", alquileres.UsuarioId);
             ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula", alquileres.VehiculoId);
             return View(alquileres);

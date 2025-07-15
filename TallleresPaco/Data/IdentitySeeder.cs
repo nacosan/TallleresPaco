@@ -17,7 +17,10 @@ namespace TuProyecto.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            
+            var user = await userManager.FindByEmailAsync("admin@empresa.com");
+            if (user != null && !await userManager.IsInRoleAsync(user, "Admin"))
+                await userManager.AddToRoleAsync(user, "Admin");
+
         }
     }
 }
