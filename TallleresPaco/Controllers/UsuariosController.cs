@@ -80,6 +80,7 @@ namespace TallleresPaco.Controllers
         }
 
         // GET: Usuarios/Edit/5
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -351,7 +352,7 @@ namespace TallleresPaco.Controllers
                 .Select(a => new AlquilerReporte
                 {
                     IdAlquiler = a.Id,
-                    UsuarioNombre = "", // usuario actual
+                    UsuarioNombre = "", 
                     VehiculoMatricula = a.Vehiculo.Matricula,
                     FechaInicio = a.FechaInicio,
                     FechaFin = a.FechaFin,
@@ -363,8 +364,7 @@ namespace TallleresPaco.Controllers
             return View("Manage/ReservasRecientes", vm);
         }
 
-        // Método auxiliar ficticio para obtener el id de usuario actual (ajustar según auth real)
-        private int GetLoggedUserId()
+      private int GetLoggedUserId()
         {
             string mail = User.Identity.Name;
             int usuId = 0;
