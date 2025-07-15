@@ -12,16 +12,16 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaInicio)
+           Fecha de Inicio
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaInicio)
+            @Model.FechaInicio.ToString("dd/MM/yyyy")
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaFin)
+            Fecha de Finalización
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaFin)
+            @Model.FechaFin.ToString("dd/MM/yyyy")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Precio)
@@ -30,7 +30,7 @@
             @Html.DisplayFor(model => model.Precio)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrecioFinal)
+            Precio Final
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PrecioFinal)
@@ -48,7 +48,7 @@
             @Html.DisplayFor(model => model.Usuario.Id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Vehiculo)
+            Matrícula
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Vehiculo.Id)

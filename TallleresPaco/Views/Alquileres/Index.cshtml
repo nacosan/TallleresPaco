@@ -13,16 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FechaInicio)
+                Fecha de Inicio
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FechaFin)
+                Fecha de Finalización
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Precio)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PrecioFinal)
+                Precio Final
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Estado)
@@ -31,19 +31,18 @@
                 @Html.DisplayNameFor(model => model.Usuario)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Vehiculo)
+                Matricula
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaInicio)
+                    @item.FechaInicio.ToString("dd/MM/yyyy")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaFin)
+                    @item.FechaFin.ToString("dd/MM/yyyy")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Precio)

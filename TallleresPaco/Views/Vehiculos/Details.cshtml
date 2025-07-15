@@ -35,10 +35,10 @@
             @Html.DisplayFor(model => model.Color)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AnioFab)
+            Año de Fabricación
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AnioFab)
+            @Model.AnioFab.ToString("dd/MM/yyyy")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Tipo)
