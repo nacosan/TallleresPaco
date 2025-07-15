@@ -198,7 +198,9 @@ namespace TallleresPaco.Controllers
         // 2. Histórico de alquileres por usuario
         public async Task<IActionResult> HistoricoAlquileres()
         {
+            var userId = GetLoggedUserId();
             var historico = await _context.Alquileres
+                .Where(a => a.Id == userId)
                 .Include(a => a.Usuario) // incluye usuario
                 .Include(a => a.Vehiculo) // incluye vehículo
                 .Select(a => new AlquilerReporte
