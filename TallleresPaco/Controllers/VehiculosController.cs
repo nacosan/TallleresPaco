@@ -85,19 +85,33 @@ namespace TallleresPaco.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Matricula,Modelo,Marca,Color,AnioFab,Tipo,Precio,Categoria,Estado")] Vehiculos vehiculos)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Matricula,Modelo,Marca,Color,AnioFab,Tipo,Precio,Categoria")] Vehiculos vehiculos)
         {
             if (id != vehiculos.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+           
                 try
                 {
-                    _context.Update(vehiculos);
+                    var vehiculoExistente = await _context.Vehiculos.FindAsync(id);
+                    if (vehiculoExistente == null)
+                        return NotFound();
+
+                    // Actualizar solo los campos permitidos (excluyendo Estado)
+                    vehiculoExistente.Matricula = vehiculos.Matricula;
+                    vehiculoExistente.Modelo = vehiculos.Modelo;
+                    vehiculoExistente.Marca = vehiculos.Marca;
+                    vehiculoExistente.Color = vehiculos.Color;
+                    vehiculoExistente.AnioFab = vehiculos.AnioFab;
+                    vehiculoExistente.Tipo = vehiculos.Tipo;
+                    vehiculoExistente.Precio = vehiculos.Precio;
+                    vehiculoExistente.Categoria = vehiculos.Categoria;
+                    // Estado no se toca
+
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -110,8 +124,8 @@ namespace TallleresPaco.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
+            
+
             return View(vehiculos);
         }
 
@@ -138,13 +152,12 @@ namespace TallleresPaco.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var vehiculos = await _context.Vehiculos.FindAsync(id);
-            if (vehiculos != null)
+            var vehiculo = await _context.Vehiculos.FindAsync(id);
+            if (vehiculo != null)
             {
-                _context.Vehiculos.Remove(vehiculos);
+                vehiculo.Estado = "Cancelado";
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

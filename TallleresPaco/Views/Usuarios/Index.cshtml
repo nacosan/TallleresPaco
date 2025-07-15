@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.Apellido)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FechaNacimiento)
+                Fecha de Nacimiento
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Dni)
@@ -43,7 +43,7 @@
                 @Html.DisplayFor(modelItem => item.Apellido)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaNacimiento)
+                @item.FechaNacimiento?.ToString("dd/MM/yyyy")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Dni)

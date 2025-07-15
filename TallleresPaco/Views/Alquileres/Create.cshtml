@@ -13,20 +13,20 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="UsuarioId" class="control-label"></label>
+                <label asp-for="UsuarioId" class="control-label">Usuario</label>
                 <select asp-for="UsuarioId" class ="form-control" asp-items="ViewBag.UsuarioId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="VehiculoId" class="control-label"></label>
+                <label asp-for="VehiculoId" class="control-label">Matricula del Vehículo</label>
                 <select asp-for="VehiculoId" class ="form-control" asp-items="ViewBag.VehiculoId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="FechaInicio" class="control-label"></label>
+                <label asp-for="FechaInicio" class="control-label">Fecha De Inicio</label>
                 <input asp-for="FechaInicio" class="form-control" />
                 <span asp-validation-for="FechaInicio" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FechaFin" class="control-label"></label>
+                <label asp-for="FechaFin" class="control-label">Fecha De Finalización</label>
                 <input asp-for="FechaFin" class="form-control" />
                 <span asp-validation-for="FechaFin" class="text-danger"></span>
             </div>
@@ -41,8 +41,8 @@
                 <span asp-validation-for="PrecioFinal" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
+                <label hidden asp-for="Estado" class="control-label"></label>
+                <input hidden asp-for="Estado" class="form-control" value="Alquilado"/>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
             <div class="form-group">
