@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -167,6 +168,7 @@ namespace TallleresPaco.Controllers
         {
             return _context.Usuarios.Any(e => e.Id == id);
         }
+        [Authorize]
         public async Task<IActionResult> Manage()
         {
             return View("Manage/Index");
