@@ -1,0 +1,220 @@
+﻿@model List<TallleresPaco.Models.Vehiculos>
+
+@{
+    var marcas = ViewBag.Marcas as List<string> ?? new List<string>();
+    var modelos = ViewBag.Modelos as List<string> ?? new List<string>();
+    var tipos = ViewBag.Tipos as List<string> ?? new List<string>();
+    var categorias = ViewBag.Categorias as List<string> ?? new List<string>();
+    var filtros = Context.Request.Query;
+    var precioMinVal = string.IsNullOrWhiteSpace(filtros["PrecioMin"]) ? "0" : filtros["PrecioMin"].ToString();
+    var precioMaxVal = string.IsNullOrWhiteSpace(filtros["PrecioMax"]) ? "50000" : filtros["PrecioMax"].ToString();
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.css" />
+
+<section class="container my-5">
+    <div class="row">
+        <!-- Filtros -->
+        <div class="col-12 col-md-4 col-lg-3 mb-4">
+            <button class="btn btn-dark w-100 mb-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosPanel" aria-expanded="false" aria-controls="filtrosPanel">
+                <i class="bi bi-funnel"></i> Filtros
+            </button>
+
+            <div class="collapse d-md-block show" id="filtrosPanel">
+                <form method="get" class="p-4 rounded shadow-sm filtros-dark">
+                    <h5 class="mb-4 text-white"><i class="bi bi-funnel"></i> Filtrar vehículos</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label">Marca</label>
+                        <select name="Marca" class="form-select">
+                            <option value="">Todas</option>
+                            @foreach (var m in marcas)
+                            {
+                                if (filtros["Marca"].ToString() == m)
+                                {
+                                    <option value="@m" selected>@m</option>
+                                }
+                                else
+                                {
+                                    <option value="@m">@m</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Modelo</label>
+                        <select name="Modelo" class="form-select">
+                            <option value="">Todos</option>
+                            @foreach (var mod in modelos)
+                            {
+                                if (filtros["Modelo"].ToString() == mod)
+                                {
+                                    <option value="@mod" selected>@mod</option>
+                                }
+                                else
+                                {
+                                    <option value="@mod">@mod</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Año fabricación</label>
+                        <input type="number" name="AnioFab" class="form-control"
+                               value="@filtros["AnioFab"]" min="1900" max="2100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select name="Tipo" class="form-select">
+                            <option value="">Todos</option>
+                            @foreach (var tipo in tipos)
+                            {
+                                if (filtros["Tipo"].ToString() == tipo)
+                                {
+                                    <option value="@tipo" selected>@tipo</option>
+                                }
+                                else
+                                {
+                                    <option value="@tipo">@tipo</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select name="Categoria" class="form-select">
+                            <option value="">Todas</option>
+                            @foreach (var cat in categorias)
+                            {
+                                if (filtros["Categoria"].ToString() == cat)
+                                {
+                                    <option value="@cat" selected>@cat</option>
+                                }
+                                else
+                                {
+                                    <option value="@cat">@cat</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Rango de precios</label>
+                        <div class="mb-2" id="sliderPrecio" style="max-width:200px;"></div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <input type="number" id="precioMin" name="PrecioMin"
+                                   class="form-control form-control-sm bg-dark text-white border-secondary me-1"
+                                   style="width: 80px;" value="@precioMinVal" readonly />
+                            <input type="number" id="precioMax" name="PrecioMax"
+                                   class="form-control form-control-sm bg-dark text-white border-secondary ms-1"
+                                   style="width: 80px;" value="@precioMaxVal" readonly />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3"><i class="bi bi-search"></i> Buscar</button>
+                    <button type="reset" class="btn btn-danger w-100 mt-3">Resetear filtros</button>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="col-12 col-md-8 col-lg-9">
+            <div class="row g-4">
+                @if (Model.Any())
+                {
+                    @foreach (var v in Model)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4 d-flex">
+                            <div class="all-events-card h-100 d-flex flex-column position-relative w-100">
+                                <div class="all-events-img-wrapper">
+                                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80"
+                                         class="all-events-img"
+                                         alt="@v.Marca @v.Modelo">
+                                </div>
+                                <div class="card-body flex-grow-1 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="fw-bold mb-1">@v.Marca @v.Modelo</div>
+                                        <div class="mb-1">Año: @v.AnioFab</div>
+                                        <div class="mb-1">Tipo: @v.Tipo</div>
+                                        <div class="mb-1">Categoría: @v.Categoria</div>
+                                        <div class="all-events-date mb-2">Precio: @v.Precio.ToString("C")</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">No hay vehículos que coincidan con los filtros.</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var slider = document.getElementById('sliderPrecio');
+        if (slider) {
+            var min = parseInt('@precioMinVal', 10);
+            var max = parseInt('@precioMaxVal', 10);
+            if (isNaN(min)) min = 0;
+            if (isNaN(max) || max < min) max = 50000;
+            noUiSlider.create(slider, {
+                start: [min, max],
+                connect: true,
+                range: { min: 0, max: 50000 },
+                step: 100,
+                tooltips: [true, true],
+                format: {
+                    to: value => Math.round(value),
+                    from: value => Number(value)
+                }
+            });
+            slider.noUiSlider.on('update', function (values, handle) {
+                document.getElementById('precioMin').value = values[0];
+                document.getElementById('precioMax').value = values[1];
+            });
+        }
+    });
+</script>
+
+<style>
+    .filtros-dark {
+        background: #18181b;
+        color: #fff;
+        border: 1px solid #232323;
+    }
+
+        .filtros-dark .form-label,
+        .filtros-dark label,
+        .filtros-dark select,
+        .filtros-dark input,
+        .filtros-dark option {
+            color: #e0e0e0 !important;
+            background: #232323 !important;
+            border-color: #2a2a2a !important;
+        }
+
+    .all-events-img-wrapper img {
+        max-width: 100%;
+        border-radius: 4px;
+    }
+
+    .all-events-card {
+        border: 1px solid #e0e0e0;
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+</style>
