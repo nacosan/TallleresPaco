@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using TallleresPaco.Models;
+/*using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;*/
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Kernel.Font;
+using iText.IO.Font.Constants;
 
 namespace TallleresPaco.Controllers
 {
@@ -234,8 +237,66 @@ namespace TallleresPaco.Controllers
                     Categoria = v.Categoria
                 }).ToListAsync();
 
-            var vm = new ReportesViewModel { Vehiculos = vehiculos };
-            return View(vm);
+
+            byte[] pdfBytes = GenerarPDFVehiculos(vehiculos);
+
+            return File(pdfBytes, "application/pdf", "Listado_Vehiculos.pdf");
+            /*// Generar PDF con QuestPDF --> Como peta la funcion tambien peta aqui
+            var pdfBytes = GenerateVehiculosPdf(vehiculos);
+
+            return File(pdfBytes, "application/pdf", "Vehiculos.pdf");*/
+        }
+        private byte[] GenerarPDFVehiculos(List<VehiculoReporte> vehiculos)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                var writer = new PdfWriter(memoryStream);
+                var pdf = new PdfDocument(writer);
+                var document = new Document(pdf);
+
+                // Título del documento
+                var titulo = new Paragraph("Listado de Vehículos")
+                    .SetFontSize(20)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetMarginBottom(20);
+                document.Add(titulo);
+
+                // Crear tabla
+                iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(8).UseAllAvailableWidth();
+
+                // Encabezados
+                string[] encabezados = new[] {
+            "ID", "Matrícula", "Modelo", "Marca", "Color", "Año Fab.", "Precio", "Categoría"
+        };
+
+                PdfFont fontBold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+
+                foreach (var header in encabezados)
+                {
+                    tabla.AddHeaderCell(new Cell()
+                        .Add(new Paragraph(header).SetFont(fontBold))
+                        .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY)
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER));
+                }
+
+                // Filas de datos
+                foreach (var v in vehiculos)
+                {
+                    tabla.AddCell(new Paragraph(v.IdVehiculo.ToString()));
+                    tabla.AddCell(new Paragraph(v.Matricula));
+                    tabla.AddCell(new Paragraph(v.Modelo));
+                    tabla.AddCell(new Paragraph(v.Marca));
+                    tabla.AddCell(new Paragraph(v.Color));
+                    tabla.AddCell(new Paragraph(v.AnioFab.Year.ToString()));
+                    tabla.AddCell(new Paragraph(v.Precio.ToString("C")));
+                    tabla.AddCell(new Paragraph(v.Categoria));
+                }
+
+                document.Add(tabla);
+
+                document.Close();
+                return memoryStream.ToArray();
+            }
         }
 
         // 4. Reporte escudería: nombre + total alquileres
