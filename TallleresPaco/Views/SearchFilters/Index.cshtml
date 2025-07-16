@@ -1,5 +1,8 @@
 ﻿@model List<TallleresPaco.Models.Vehiculos>
-
+@{
+    ViewData["Title"] = "Pagina de Buscar";
+    var isAdmin = User.IsInRole("Admin");
+}
 @{
     var marcas = ViewBag.Marcas as List<string> ?? new List<string>();
     var modelos = ViewBag.Modelos as List<string> ?? new List<string>();
@@ -145,6 +148,11 @@
                                         <div class="mb-1">Tipo: @v.Tipo</div>
                                         <div class="mb-1">Categoría: @v.Categoria</div>
                                         <div class="all-events-date mb-2">Precio: @v.Precio.ToString("C")</div>
+                                        @if (isAdmin)
+                                        {
+                                            <div class="mb-1">Estado: @v.Estado</div>
+
+                                        }
                                     </div>
                                 </div>
                             </div>

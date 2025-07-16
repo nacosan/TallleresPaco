@@ -1,40 +1,48 @@
 ﻿@model ReportesViewModel
-
 @{
-    ViewData["Title"] = "Mis Reservas";
+    ViewData["Title"] = "Reservas";
+    var isAdmin = User.IsInRole("Admin");
 }
 
 <h2>@ViewData["Title"]</h2>
 
 @if (Model.ReservasUsuario == null || !Model.ReservasUsuario.Any())
 {
-        <p>No tienes reservas registradas.</p>
+    <p>No hay reservas para mostrar.</p>
 }
 else
 {
-        <table class="table table-striped table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>Id Alquiler</th>
-                    <th>Matrícula Vehículo</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Fin</th>
-                    <th>Precio</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID Alquiler</th>
+                @if (isAdmin)
+                {
+                    <th>Usuario</th>
+                }
+                <th>Matrícula</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Precio</th>
+        
+            </tr>
+        </thead>
+        <tbody>
             @foreach (var reserva in Model.ReservasUsuario)
             {
-                        <tr>
-                            <td>@reserva.IdAlquiler</td>
-                            <td>@reserva.VehiculoMatricula</td>
-                            <td>@reserva.FechaInicio.ToString("dd/MM/yyyy")</td>
-                            <td>@reserva.FechaFin.ToString("dd/MM/yyyy")</td>
-                            <td>@reserva.Precio.ToString("C")</td>
-                            <td>@reserva.Estado</td>
-                        </tr>
+                <tr>
+                    <td>@reserva.IdAlquiler</td>
+                    @if (isAdmin)
+                    {
+                        <td>@reserva.UsuarioNombre</td>
+                    }
+                    <td>@reserva.VehiculoMatricula</td>
+                    <td>@reserva.FechaInicio.ToString("dd/MM/yyyy")</td>
+                    <td>@reserva.FechaFin.ToString("dd/MM/yyyy")</td>
+                    <td>@reserva.Precio.ToString("C")</td>
+                    
+                </tr>
             }
-            </tbody>
-        </table>
+        </tbody>
+    </table>
 }

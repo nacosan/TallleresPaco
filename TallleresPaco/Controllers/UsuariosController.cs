@@ -220,28 +220,8 @@ namespace TallleresPaco.Controllers
             return View("Manage/UsuariosRecientes", vm);
         }
 
-        // 2. Histórico de alquileres por usuario
-        public async Task<IActionResult> HistoricoAlquileres()
-        {
-            var userId = GetLoggedUserId();
-            var historico = await _context.Alquileres
-                .Where(a => a.Id == userId)
-                .Include(a => a.Usuario) // incluye usuario
-                .Include(a => a.Vehiculo) // incluye vehículo
-                .Select(a => new AlquilerReporte
-                {
-                    IdAlquiler = a.Id,
-                    UsuarioNombre = a.Usuario.Nombre + " " + a.Usuario.Apellido,
-                    VehiculoMatricula = a.Vehiculo.Matricula,
-                    FechaInicio = a.FechaInicio,
-                    FechaFin = a.FechaFin,
-                    Precio = a.Precio,
-                    Estado = a.Estado
-                }).ToListAsync();
 
-            var vm = new ReportesViewModel { HistoricoAlquileres = historico };
-            return View("Manage/HistoricoAlquileres", vm);
-        }
+      
 
         // 3. Descargar PDF con todos los vehículos (solo paso datos, el PDF se genera en la vista o servicio)
         public async Task<IActionResult> DescargarVehiculosPdf()
@@ -337,55 +317,98 @@ namespace TallleresPaco.Controllers
             return View("Manage/ReporteEscuderia", vm);
         }
 
-        // 5. Consultar reservas usuario (supongo que id usuario es el logueado, lo puedes ajustar)
+        [Authorize(Roles = "User,Admin")]
+        [Authorize]
         public async Task<IActionResult> ConsultarReservas()
         {
-            // Ejemplo con usuario logueado (ajustar con autenticación)
-            var userId = GetLoggedUserId();
+            List<AlquilerReporte> reservas;
 
-            var reservas = await _context.Alquileres
-                .Where(a => a.Id == userId)
-                .Include(a => a.Vehiculo)
-                .Select(a => new AlquilerReporte
-                {
-                    IdAlquiler = a.Id,
-                    UsuarioNombre = "", // no es necesario porque es el usuario actual
-                    VehiculoMatricula = a.Vehiculo.Matricula,
-                    FechaInicio = a.FechaInicio,
-                    FechaFin = a.FechaFin,
-                    Precio = a.Precio,
-                    Estado = a.Estado
-                }).ToListAsync();
+            if (User.IsInRole("Admin"))
+            {
+                reservas = await _context.Alquileres
+                    .Include(a => a.Usuario)
+                    .Include(a => a.Vehiculo)
+                    .Select(a => new AlquilerReporte
+                    {
+                        IdAlquiler = a.Id,
+                        UsuarioNombre = a.Usuario.Nombre + " " + a.Usuario.Apellido,
+                        VehiculoMatricula = a.Vehiculo.Matricula,
+                        FechaInicio = a.FechaInicio,
+                        FechaFin = a.FechaFin,
+                        Precio = a.Precio,
+                        Estado = a.Estado
+                    }).ToListAsync();
+            }
+            else
+            {
+                var userId = GetLoggedUserId();
+                reservas = await _context.Alquileres
+                    .Where(a => a.UsuarioId == userId)
+                    .Include(a => a.Vehiculo)
+                    .Select(a => new AlquilerReporte
+                    {
+                        IdAlquiler = a.Id,
+                        UsuarioNombre = "", // Opcional
+                        VehiculoMatricula = a.Vehiculo.Matricula,
+                        FechaInicio = a.FechaInicio,
+                        FechaFin = a.FechaFin,
+                        Precio = a.Precio,
+                        Estado = a.Estado
+                    }).ToListAsync();
+            }
 
             var vm = new ReportesViewModel { ReservasUsuario = reservas };
             return View("Manage/ConsultarReservas", vm);
         }
 
+
         // 6. Consultar reservas últimos 2 meses (para el usuario logueado)
+        [Authorize]
         public async Task<IActionResult> ReservasRecientes()
         {
-            var userId = GetLoggedUserId();
             var dosMesesAtras = DateTime.Now.AddMonths(-2);
+            List<AlquilerReporte> reservas;
 
-            var reservas = await _context.Alquileres
-                .Where(a => a.Id == userId && a.FechaInicio >= dosMesesAtras)
-                .Include(a => a.Vehiculo)
-                .Select(a => new AlquilerReporte
-                {
-                    IdAlquiler = a.Id,
-                    UsuarioNombre = "", 
-                    VehiculoMatricula = a.Vehiculo.Matricula,
-                    FechaInicio = a.FechaInicio,
-                    FechaFin = a.FechaFin,
-                    Precio = a.Precio,
-                    Estado = a.Estado
-                }).ToListAsync();
+            if (User.IsInRole("Admin"))
+            {
+                reservas = await _context.Alquileres
+                    .Where(a => a.FechaInicio >= dosMesesAtras)
+                    .Include(a => a.Usuario)
+                    .Include(a => a.Vehiculo)
+                    .Select(a => new AlquilerReporte
+                    {
+                        IdAlquiler = a.Id,
+                        UsuarioNombre = a.Usuario.Nombre + " " + a.Usuario.Apellido,
+                        VehiculoMatricula = a.Vehiculo.Matricula,
+                        FechaInicio = a.FechaInicio,
+                        FechaFin = a.FechaFin,
+                        Precio = a.Precio,
+                        Estado = a.Estado
+                    }).ToListAsync();
+            }
+            else
+            {
+                var userId = GetLoggedUserId();
+                reservas = await _context.Alquileres
+                    .Where(a => a.UsuarioId == userId && a.FechaInicio >= dosMesesAtras)
+                    .Include(a => a.Vehiculo)
+                    .Select(a => new AlquilerReporte
+                    {
+                        IdAlquiler = a.Id,
+                        VehiculoMatricula = a.Vehiculo.Matricula,
+                        FechaInicio = a.FechaInicio,
+                        FechaFin = a.FechaFin,
+                        Precio = a.Precio,
+                        Estado = a.Estado
+                    }).ToListAsync();
+            }
 
             var vm = new ReportesViewModel { ReservasUltimosDosMeses = reservas };
             return View("Manage/ReservasRecientes", vm);
         }
 
-      private int GetLoggedUserId()
+
+        private int GetLoggedUserId()
         {
             string mail = User.Identity.Name;
             int usuId = 0;
