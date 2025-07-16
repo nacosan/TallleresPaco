@@ -50,6 +50,9 @@ namespace TallleresPaco.Controllers
         {
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre");
             ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula");
+            // Pasar un diccionario de precios para que JS pueda acceder
+            var preciosVehiculos = _context.Vehiculos.ToDictionary(v => v.Id, v => v.Precio);
+            ViewBag.PreciosVehiculos = preciosVehiculos;
 
             return View();
         }
@@ -63,12 +66,23 @@ namespace TallleresPaco.Controllers
         {
             if (ModelState.IsValid)
             {
+                /*TimeSpan diferencia = alquileres.FechaFin - alquileres.FechaInicio;
+                int dias = diferencia.Days;
+                decimal pf = dias * alquileres.Precio;
+                alquileres.PrecioFinal = pf;*/
                 _context.Add(alquileres);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", alquileres.UsuarioId);
             ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Id", alquileres.VehiculoId);
+            /*var vehiculoSeleccionado = await _context.Vehiculos
+                                                    .FirstOrDefaultAsync(v => v.Id == alquileres.VehiculoId);
+            if (vehiculoSeleccionado != null)
+            {
+                ViewData["VehiculoPrecio"] = vehiculoSeleccionado.Precio;
+            }*/
+
             return View(alquileres);
         }
 
