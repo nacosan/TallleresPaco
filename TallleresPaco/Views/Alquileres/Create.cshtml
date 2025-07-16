@@ -5,10 +5,10 @@
 
 @{
     ViewData["Title"] = "Create";
-
     var isAdmin = User.IsInRole("Admin");
     var usuarioId = ViewData["UsuarioId"];
     var vehiculoId = ViewData["VehiculoId"];
+    var vehiculoPrecio = ViewBag.VehiculoPrecio ?? 0.0;
 }
 
 <h1>Create</h1>
@@ -20,62 +20,56 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-
             @if (isAdmin)
             {
                 <div class="form-group">
-                    <label asp-for="UsuarioId" class="control-label"></label>
+                    <label asp-for="UsuarioId"></label>
                     <select asp-for="UsuarioId" class="form-control" asp-items="ViewBag.UsuarioId"></select>
                 </div>
+
                 <div class="form-group">
-                    <label asp-for="VehiculoId" class="control-label"></label>
-                    <select asp-for="VehiculoId" class="form-control" asp-items="ViewBag.VehiculoId"></select>
+                    <label asp-for="VehiculoId"></label>
+                    <select asp-for="VehiculoId" class="form-control" asp-items="ViewBag.VehiculoId" id="VehiculoId"></select>
                 </div>
             }
             else
             {
                 <input type="hidden" asp-for="UsuarioId" value="@usuarioId" />
-                <input type="hidden" asp-for="VehiculoId" value="@vehiculoId" />
+                <input type="hidden" asp-for="VehiculoId" value="@vehiculoId" id="VehiculoId" />
             }
 
-
             <div class="form-group">
-                <label asp-for="FechaInicio" class="control-label">Fecha De Inicio</label>
+                <label asp-for="FechaInicio">Fecha De Inicio</label>
                 <input asp-for="FechaInicio" class="form-control" id="FechaInicio" type="date" />
                 <span asp-validation-for="FechaInicio" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="FechaFin" class="control-label">Fecha De Finalización</label>
+                <label asp-for="FechaFin">Fecha De Finalización</label>
                 <input asp-for="FechaFin" class="form-control" id="FechaFin" type="date" />
                 <span asp-validation-for="FechaFin" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Precio" class="control-label">Precio</label>
-                <input readonly asp-for="Precio" class="form-control" value="@ViewBag.VehiculoPrecio" />
+                <label asp-for="Precio">Precio</label>
+                <input asp-for="Precio" class="form-control" id="Precio" readonly />
                 <span asp-validation-for="Precio" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="PrecioFinal" class="control-label">Precio Final</label>
+                <label asp-for="PrecioFinal">Precio Final</label>
                 <input asp-for="PrecioFinal" class="form-control" id="PrecioFinal" readonly />
                 <span asp-validation-for="PrecioFinal" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label hidden asp-for="Estado" class="control-label"></label>
-                <input hidden asp-for="Estado" class="form-control" value="Alquilado" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="Estado" value="Alquilado" />
 
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
 
 <div>
     <a asp-action="Index">Back to List</a>
@@ -84,63 +78,54 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
     }
 
-
-    }
     <script>
-        // Obtener el diccionario de precios desde ViewBag (serializado a JSON)
-        var preciosVehiculos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.PreciosVehiculos));
+        var preciosVehiculos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.PreciosVehiculos ?? new Dictionary<string, double>()));
 
-        // Referencias a elementos
-        var selectVehiculo = document.getElementById('VehiculoId');
-        var inputPrecio = document.getElementById('Precio');
-
-        // Función para actualizar el precio al cambiar el vehículo
         function actualizarPrecio() {
-            var vehiculoId = selectVehiculo.value;
+            var vehiculoId = document.getElementById('VehiculoId')?.value;
+            var inputPrecio = document.getElementById('Precio');
+
             if (vehiculoId && preciosVehiculos[vehiculoId] !== undefined) {
                 inputPrecio.value = preciosVehiculos[vehiculoId].toFixed(2);
             } else {
                 inputPrecio.value = '';
             }
+
+            calcularPrecioFinal(); // actualiza también el precio final
         }
 
-        // Evento onchange para el select de vehículos
-        selectVehiculo.addEventListener('change', actualizarPrecio);
-
-        // Opcional: actualizar precio al cargar la página (si hay valor seleccionado)
-        actualizarPrecio();
-    </script>
-    <script>
-        // Función para calcular el PrecioFinal
         function calcularPrecioFinal() {
-            var fechaInicio = document.getElementById('FechaInicio').value;
-            var fechaFin = document.getElementById('FechaFin').value;
-            var precio = parseFloat(document.getElementById('Precio').value);
+            var fechaInicioStr = document.getElementById('FechaInicio').value;
+            var fechaFinStr = document.getElementById('FechaFin').value;
+            var precioStr = document.getElementById('Precio').value;
+            var precioFinalInput = document.getElementById('PrecioFinal');
 
+            var precio = parseFloat(precioStr);
 
-            if (fechaInicio && fechaFin) {
-                // Convertir las fechas a objetos Date
-                var inicio = new Date(fechaInicio);
-                var fin = new Date(fechaFin);
+            if (fechaInicioStr && fechaFinStr && !isNaN(precio)) {
+                var inicio = new Date(fechaInicioStr);
+                var fin = new Date(fechaFinStr);
 
-                // Calcular la diferencia de días
-                var diferencia = (fin - inicio) / (1000 * 3600 * 24); // Convertir a días
-                if (diferencia < 0) {
-                    alert('La fecha de fin no puede ser anterior a la fecha de inicio.');
-                    return;
+                var diffDias = (fin - inicio) / (1000 * 60 * 60 * 24);
+                if (diffDias >= 0) {
+                    var precioFinal = diffDias * precio;
+                    precioFinalInput.value = precioFinal.toFixed(2);
+                } else {
+                    alert("La fecha final debe ser posterior a la fecha de inicio");
+                    precioFinalInput.value = '';
                 }
-
-                // Calcular el precio final
-                var precioFinal = diferencia * precio;
-                document.getElementById('PrecioFinal').value = precioFinal.toFixed(2); // Mostrar el precio final
             }
         }
 
-        // Ejecutar el cálculo cada vez que las fechas cambian
         document.getElementById('FechaInicio').addEventListener('change', calcularPrecioFinal);
         document.getElementById('FechaFin').addEventListener('change', calcularPrecioFinal);
-    </script>
 
+        var selectVehiculo = document.getElementById('VehiculoId');
+        if (selectVehiculo) {
+            selectVehiculo.addEventListener('change', actualizarPrecio);
+            actualizarPrecio();  // Carga inicial
+        }
+    </script>
+}
