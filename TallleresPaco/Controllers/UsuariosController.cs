@@ -80,18 +80,23 @@ namespace TallleresPaco.Controllers
         }
 
         // GET: Usuarios/Edit/5
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
-            {
                 return NotFound();
+
+            var currentUserEmail = User.Identity.Name;
+            var userIsAdmin = User.IsInRole("Admin");
+
+            if (!userIsAdmin && usuario.Email != currentUserEmail)
+            {
+                return Forbid(); 
             }
 
             var vm = new UsuarioRegistroViewModel
@@ -103,8 +108,24 @@ namespace TallleresPaco.Controllers
                 Estado = usuario.Estado
             };
 
-            return View(vm); 
+            return View(vm);
         }
+        // GET: Usuarios/Edit/5
+
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userEmail = User.Identity.Name;
+
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == userEmail); // o Dni, etc
+
+            if (usuario == null)
+                return NotFound();
+
+            return RedirectToAction("Edit", new { id = usuario.Id });
+        }
+
         // POST: Usuarios/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.

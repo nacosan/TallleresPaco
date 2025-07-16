@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@inject TallleresPaco.Models.Contexto _context
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,10 +26,22 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
+                        @{
+                            var usuario = _context.Set<TallleresPaco.Models.Usuarios>()
+                            .FirstOrDefault(u => u.Email == User.Identity.Name); 
+
+                            int? usuarioId = usuario?.Id;
+                        }
+
+                   
+
                         @if (User.IsInRole("User"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="SearchFilters" asp-action="Index">Buscar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Usuarios" asp-action="Edit" asp-route-id="@usuarioId">Editar Perfil</a>
                             </li>
                           
                         }
