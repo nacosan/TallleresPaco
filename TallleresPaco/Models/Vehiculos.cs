@@ -36,6 +36,7 @@ namespace TallleresPaco.Models
 
         [Column("precio")]
         public decimal Precio { get; set; }
+ 
 
         [Column("categoria")]
         [StringLength(50)]

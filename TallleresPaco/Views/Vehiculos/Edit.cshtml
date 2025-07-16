@@ -44,10 +44,15 @@
                 <span asp-validation-for="Tipo" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Precio" class="control-label"></label>
-                <input asp-for="Precio" class="form-control" />
-                <span asp-validation-for="Precio" class="text-danger"></span>
+                <label for="Precio" class="control-label">Precio</label>
+                <input id="Precio" name="Precio" value="@Model.Precio" class="form-control"/>
+                
             </div>
+            @* <div class="form-group">
+                <label asp-for="Precio" class="control-label"></label>
+                <input asp-for="Precio" class="form-control"  />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div> *@
             <div class="form-group">
                 <label asp-for="Categoria" class="control-label"></label>
                 <input asp-for="Categoria" class="form-control" />
@@ -66,5 +71,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

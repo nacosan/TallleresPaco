@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -106,7 +107,7 @@ namespace TallleresPaco.Controllers
                     vehiculoExistente.Color = vehiculos.Color;
                     vehiculoExistente.AnioFab = vehiculos.AnioFab;
                     vehiculoExistente.Tipo = vehiculos.Tipo;
-                    vehiculoExistente.Precio = vehiculos.Precio;
+                vehiculoExistente.Precio = new decimal((double)vehiculos.Precio); // vehiculos.Precio;
                     vehiculoExistente.Categoria = vehiculos.Categoria;
                     // Estado no se toca
 

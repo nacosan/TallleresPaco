@@ -6,7 +6,7 @@ CREATE TABLE vehiculos(
     color VARCHAR(50),
     aniofab DATETIME,
     tipo VARCHAR(50),
-    precio DECIMAL,
+    precio DECIMAL (5,2),
     categoria VARCHAR(50),
     estado VARCHAR(50)
 );
@@ -25,8 +25,8 @@ CREATE TABLE alquileres(
     idveh INT,
     fecini DATETIME,
     fecfin DATETIME,
-    precio DECIMAL,
-    prefin DECIMAL,
+    precio DECIMAL (5,2),
+    prefin DECIMAL (5,2),
     estado VARCHAR(50),
     CONSTRAINT alquileres_fk1 FOREIGN KEY (idusu) REFERENCES usuarios(id),
     CONSTRAINT alquileres_fk2 FOREIGN KEY (idveh) REFERENCES vehiculos(id)
