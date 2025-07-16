@@ -172,6 +172,7 @@ namespace TallleresPaco.Controllers
                 _context.Alquileres.Remove(alquileres);
             }
 
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
