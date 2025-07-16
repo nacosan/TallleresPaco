@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -46,45 +47,48 @@ namespace TallleresPaco.Controllers
         }
 
         // GET: Alquileres/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int? idVehiculo = null)
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre");
-            ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula");
-            // Pasar un diccionario de precios para que JS pueda acceder
-            var preciosVehiculos = _context.Vehiculos.ToDictionary(v => v.Id, v => v.Precio);
-            ViewBag.PreciosVehiculos = preciosVehiculos;
+
+            if (User.IsInRole("Admin"))
+            {
+                ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+                ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula");
+            }
+            else
+            {
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
+                ViewData["UsuarioId"] = usuario?.Id;
+                ViewData["VehiculoId"] = idVehiculo;
+            }
 
             return View();
         }
+
 
         // POST: Alquileres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal,Estado")] Alquileres alquileres)
+        [Authorize]
+        public async Task<IActionResult> Create([Bind("UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal,Estado")] Alquileres alquileres)
         {
-            if (ModelState.IsValid)
+            if (!User.IsInRole("Admin"))
             {
-                /*TimeSpan diferencia = alquileres.FechaFin - alquileres.FechaInicio;
-                int dias = diferencia.Days;
-                decimal pf = dias * alquileres.Precio;
-                alquileres.PrecioFinal = pf;*/
-                _context.Add(alquileres);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", alquileres.UsuarioId);
-            ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Id", alquileres.VehiculoId);
-            /*var vehiculoSeleccionado = await _context.Vehiculos
-                                                    .FirstOrDefaultAsync(v => v.Id == alquileres.VehiculoId);
-            if (vehiculoSeleccionado != null)
-            {
-                ViewData["VehiculoPrecio"] = vehiculoSeleccionado.Precio;
-            }*/
 
-            return View(alquileres);
+                var userEmail = User.Identity.Name;
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == userEmail);
+                alquileres.UsuarioId = usuario.Id;
+            }
+
+            _context.Add(alquileres);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
         }
+
+
 
         // GET: Alquileres/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -115,6 +119,9 @@ namespace TallleresPaco.Controllers
             {
                 return NotFound();
             }
+
+
+//            if (ModelState.IsValid)
 
             
                 try
@@ -147,6 +154,8 @@ namespace TallleresPaco.Controllers
                         throw;
                     }
                 }
+
+                return RedirectToAction(nameof(Index));
             
 
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre", alquileres.UsuarioId);
@@ -185,6 +194,11 @@ namespace TallleresPaco.Controllers
                 alquiler.Estado = "Cancelado";
                 await _context.SaveChangesAsync();
             }
+
+
+
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
