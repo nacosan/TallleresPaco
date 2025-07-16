@@ -22,7 +22,13 @@ namespace TallleresPaco.Controllers
         // GET: Vehiculos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Vehiculos.ToListAsync());
+            var userIsAdmin = User.IsInRole("Admin");
+
+            var vehiculos = await _context.Vehiculos
+                .Where(v => userIsAdmin || v.Estado == "disponible")
+                .ToListAsync();
+
+            return View(vehiculos);
         }
 
         // GET: Vehiculos/Details/5
