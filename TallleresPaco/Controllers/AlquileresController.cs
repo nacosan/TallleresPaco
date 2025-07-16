@@ -61,6 +61,16 @@ namespace TallleresPaco.Controllers
                 ViewData["UsuarioId"] = usuario?.Id;
                 ViewData["VehiculoId"] = idVehiculo;
             }
+            decimal? precio = null;
+
+            if (idVehiculo != null)
+            {
+                precio = await _context.Vehiculos
+                    .Where(v => v.Id == idVehiculo)
+                    .Select(v => (decimal?)v.Precio)
+                    .FirstOrDefaultAsync();
+            }
+            ViewBag.Precio = precio;
 
             return View();
         }
@@ -76,7 +86,8 @@ namespace TallleresPaco.Controllers
         {
             if (!User.IsInRole("Admin"))
             {
-
+                /*alquileres.Precio = new decimal((double)alquileres.Precio);
+                alquileres.PrecioFinal = new decimal((double)alquileres.PrecioFinal);*/
                 var userEmail = User.Identity.Name;
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == userEmail);
                 alquileres.UsuarioId = usuario.Id;
