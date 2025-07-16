@@ -33,7 +33,7 @@
                 <span asp-validation-for="Color" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="AnioFab" class="control-label"></label>
+                <label asp-for="AnioFab" class="control-label">Año de Fabricación</label>
                 <input asp-for="AnioFab" class="form-control" type="date"/>
                 <span asp-validation-for="AnioFab" class="text-danger"></span>
             </div>
@@ -53,8 +53,8 @@
                 <span asp-validation-for="Categoria" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
+                <label hidden asp-for="Estado" class="control-label"></label>
+                <input hidden asp-for="Estado" class="form-control" value="Activo" />
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
             <div class="form-group">

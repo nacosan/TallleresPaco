@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Color)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AnioFab)
+                Año de Fabricación
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Tipo)
@@ -41,6 +41,7 @@
             </th>
             <th></th>
         </tr>
+        
     </thead>
     <tbody>
 @foreach (var item in Model) {
@@ -58,7 +59,7 @@
                 @Html.DisplayFor(modelItem => item.Color)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AnioFab)
+                    @item.AnioFab.ToString("dd/MM/yyyy")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Tipo)
@@ -75,7 +76,7 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Cancelar Reserva</a>
             </td>
         </tr>
 }

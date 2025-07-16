@@ -49,6 +49,7 @@ namespace TallleresPaco.Controllers
         // GET: Alquileres/Create
         public async Task<IActionResult> Create(int? idVehiculo = null)
         {
+
             if (User.IsInRole("Admin"))
             {
                 ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
@@ -60,6 +61,7 @@ namespace TallleresPaco.Controllers
                 ViewData["UsuarioId"] = usuario?.Id;
                 ViewData["VehiculoId"] = idVehiculo;
             }
+
             return View();
         }
 
@@ -74,6 +76,7 @@ namespace TallleresPaco.Controllers
         {
             if (!User.IsInRole("Admin"))
             {
+
                 var userEmail = User.Identity.Name;
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == userEmail);
                 alquileres.UsuarioId = usuario.Id;
@@ -82,6 +85,7 @@ namespace TallleresPaco.Controllers
             _context.Add(alquileres);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+
         }
 
 
@@ -109,19 +113,35 @@ namespace TallleresPaco.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal,Estado")] Alquileres alquileres)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,VehiculoId,FechaInicio,FechaFin,Precio,PrecioFinal")] Alquileres alquileres)
         {
             if (id != alquileres.Id)
             {
                 return NotFound();
             }
 
+
 //            if (ModelState.IsValid)
+
             
                 try
                 {
-                    _context.Update(alquileres);
+                    // Obtener el alquiler original desde la base de datos
+                    var alquilerExistente = await _context.Alquileres.FindAsync(id);
+                    if (alquilerExistente == null)
+                        return NotFound();
+
+                    // Actualizar manualmente los campos permitidos
+                    alquilerExistente.UsuarioId = alquileres.UsuarioId;
+                    alquilerExistente.VehiculoId = alquileres.VehiculoId;
+                    alquilerExistente.FechaInicio = alquileres.FechaInicio;
+                    alquilerExistente.FechaFin = alquileres.FechaFin;
+                    alquilerExistente.Precio = alquileres.Precio;
+                    alquilerExistente.PrecioFinal = alquileres.PrecioFinal;
+                    // NO actualizar el campo Estado
+
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,8 +154,10 @@ namespace TallleresPaco.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             
+
             ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nombre", alquileres.UsuarioId);
             ViewData["VehiculoId"] = new SelectList(_context.Vehiculos, "Id", "Matricula", alquileres.VehiculoId);
             return View(alquileres);
@@ -166,14 +188,17 @@ namespace TallleresPaco.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var alquileres = await _context.Alquileres.FindAsync(id);
-            if (alquileres != null)
+            var alquiler = await _context.Alquileres.FindAsync(id);
+            if (alquiler != null)
             {
-                _context.Alquileres.Remove(alquileres);
+                alquiler.Estado = "Cancelado";
+                await _context.SaveChangesAsync();
             }
 
 
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
