@@ -18,6 +18,12 @@ namespace TallleresPaco.Controllers
         {
             IQueryable<Vehiculos> consulta = _context.Vehiculos;
 
+            if (!User.IsInRole("Admin"))
+            {
+                consulta = consulta.Where(v => v.Estado == "disponible");
+            }
+
+            // Aplicar filtros del usuario
             if (!string.IsNullOrEmpty(filters.Marca))
                 consulta = consulta.Where(v => v.Marca.Contains(filters.Marca));
 
@@ -39,14 +45,17 @@ namespace TallleresPaco.Controllers
             if (filters.PrecioMax.HasValue)
                 consulta = consulta.Where(v => v.Precio <= filters.PrecioMax.Value);
 
+            // Generar listas para filtros desplegables
             ViewBag.Marcas = await _context.Vehiculos.Select(v => v.Marca).Distinct().ToListAsync();
             ViewBag.Modelos = await _context.Vehiculos.Select(v => v.Modelo).Distinct().ToListAsync();
             ViewBag.Tipos = await _context.Vehiculos.Select(v => v.Tipo).Distinct().ToListAsync();
             ViewBag.Categorias = await _context.Vehiculos.Select(v => v.Categoria).Distinct().ToListAsync();
 
             var vehiculosFiltrados = await consulta.ToListAsync();
+
             return View(vehiculosFiltrados);
         }
+
 
 
 
