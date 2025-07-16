@@ -51,16 +51,26 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Precio">Precio</label>
-                <input asp-for="Precio" class="form-control" id="Precio" readonly />
-                <span asp-validation-for="Precio" class="text-danger"></span>
+                <label for="Precio">Precio</label>
+                <input id="Precio" name="Precio" class="form-control" id="Precio" value="@ViewBag.Precio" readonly />
+                
             </div>
+            @* <div class="form-group">
+                <label asp-for="Precio">Precio</label>
+                <input asp-for="Precio" class="form-control" id="Precio" value="@ViewBag.Precio" readonly />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div> *@
 
             <div class="form-group">
+                <label for="PrecioFinal">Precio Final</label>
+                <input id="PrecioFinal" name="PrecioFinal" class="form-control" id="PrecioFinal" readonly />
+                <span asp-validation-for="PrecioFinal" class="text-danger"></span>
+            </div>
+            @* <div class="form-group">
                 <label asp-for="PrecioFinal">Precio Final</label>
                 <input asp-for="PrecioFinal" class="form-control" id="PrecioFinal" readonly />
                 <span asp-validation-for="PrecioFinal" class="text-danger"></span>
-            </div>
+            </div> *@
 
             <input type="hidden" asp-for="Estado" value="Alquilado" />
 
@@ -81,28 +91,13 @@
     }
 
     <script>
-        var preciosVehiculos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.PreciosVehiculos ?? new Dictionary<string, double>()));
-
-        function actualizarPrecio() {
-            var vehiculoId = document.getElementById('VehiculoId')?.value;
-            var inputPrecio = document.getElementById('Precio');
-
-            if (vehiculoId && preciosVehiculos[vehiculoId] !== undefined) {
-                inputPrecio.value = preciosVehiculos[vehiculoId].toFixed(2);
-            } else {
-                inputPrecio.value = '';
-            }
-
-            calcularPrecioFinal(); // actualiza también el precio final
-        }
-
         function calcularPrecioFinal() {
             var fechaInicioStr = document.getElementById('FechaInicio').value;
             var fechaFinStr = document.getElementById('FechaFin').value;
             var precioStr = document.getElementById('Precio').value;
             var precioFinalInput = document.getElementById('PrecioFinal');
 
-            var precio = parseFloat(precioStr);
+            var precio = parseFloat(precioStr.replace(',', '.'));
 
             if (fechaInicioStr && fechaFinStr && !isNaN(precio)) {
                 var inicio = new Date(fechaInicioStr);
@@ -111,21 +106,22 @@
                 var diffDias = (fin - inicio) / (1000 * 60 * 60 * 24);
                 if (diffDias >= 0) {
                     var precioFinal = diffDias * precio;
-                    precioFinalInput.value = precioFinal.toFixed(2);
+                    
+                    precioFinalInput.value = precioFinal.toFixed(2).replace('.', ',');
+                    
                 } else {
                     alert("La fecha final debe ser posterior a la fecha de inicio");
                     precioFinalInput.value = '';
                 }
+            } else {
+                precioFinalInput.value = '';
             }
         }
-
+        
         document.getElementById('FechaInicio').addEventListener('change', calcularPrecioFinal);
         document.getElementById('FechaFin').addEventListener('change', calcularPrecioFinal);
 
-        var selectVehiculo = document.getElementById('VehiculoId');
-        if (selectVehiculo) {
-            selectVehiculo.addEventListener('change', actualizarPrecio);
-            actualizarPrecio();  // Carga inicial
-        }
+        // También podrías llamar calcularPrecioFinal al cargar la página si quieres:
+        calcularPrecioFinal();
     </script>
 }
