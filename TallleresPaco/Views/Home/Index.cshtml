@@ -1,8 +1,149 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<TallleresPaco.Models.Vehiculos>
+
+@{
+    ViewData["Title"] = "Inicio";
+    var vehiculos = Model?.ToList() ?? new List<TallleresPaco.Models.Vehiculos>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Sección Hero Principal -->
+<section class="header-fullscreen mb-5" style="position: relative; height: 400px; overflow: hidden;">
+    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1500&q=80"
+         alt="Vehículos destacados"
+         style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6);" />
+    <div class="header-overlay position-absolute top-50 start-50 translate-middle text-white text-center px-3" style="width: 100%; max-width: 600px;">
+        <h2 class="display-4 fw-bold mb-3">Encuentra tu vehículo ideal</h2>
+        <p class="lead mb-4">Los mejores modelos y ofertas en un solo lugar</p>
+        <!-- CONTENEDOR RELATIVO para input + sugerencias -->
+        <div class="mx-auto" style="position: relative; width: 100%; max-width: 540px;">
+            <input id="buscadorVehiculos" class="form-control w-100" type="search" placeholder="Buscar marca, modelo o categoría" autocomplete="off" />
+            <ul id="sugerenciasVehiculos" class="buscador-sugerencias"></ul>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-5">
+    <h2 class="mb-4 text-center">Vehículos destacados</h2>
+    <div class="row g-4 justify-content-center">
+        @if (vehiculos.Any())
+        {
+            @foreach (var v in vehiculos.Take(6))
+            {
+                <div class="col-12 col-sm-6 col-lg-4 d-flex">
+                    <div class="card event-card shadow-sm w-100 d-flex flex-column">
+                        <img src="https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="@v.Marca @v.Modelo" style="height:200px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">@v.Marca @v.Modelo</h5>
+                            <p class="card-text mb-1"><strong>Año:</strong> @v.AnioFab.Year</p>
+                            <p class="card-text mb-1"><strong>Categoría:</strong> @v.Categoria</p>
+                            <p class="card-text fw-bold text-primary">@v.Precio.ToString("C")</p>
+                            <a asp-controller="Alquileres" asp-action="Create" asp-route-idVehiculo="@v.Id" class="btn btn-success mt-auto">Reservar</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">No hay vehículos disponibles.</p>
+        }
+    </div>
+</section>
+
+<section class="container mb-5 text-center text-muted">
+    <h3>¿Por qué elegirnos?</h3>
+    <div class="row justify-content-center mt-4">
+        <div class="col-12 col-md-4">
+            <i class="bi bi-speedometer2" style="font-size:3rem; color:#0d6efd;"></i>
+            <h5 class="mt-3">Calidad y Fiabilidad</h5>
+            <p>Vehículos revisados y garantizados para tu completa satisfacción.</p>
+        </div>
+        <div class="col-12 col-md-4">
+            <i class="bi bi-cash-stack" style="font-size:3rem; color:#198754;"></i>
+            <h5 class="mt-3">Precios Competitivos</h5>
+            <p>Ofertas exclusivas y financiamiento a tu medida.</p>
+        </div>
+        <div class="col-12 col-md-4">
+            <i class="bi bi-headset" style="font-size:3rem; color:#ffc107;"></i>
+            <h5 class="mt-3">Soporte 24/7</h5>
+            <p>Atención personalizada siempre que nos necesites.</p>
+        </div>
+    </div>
+</section>
+
+<style>
+    .buscador-sugerencias {
+        /* solo esta clase, elimina 'list-group' del ul */
+        position: absolute;
+        left: 0;
+        top: 100%;
+        width: 100%;
+        background: #fff;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        z-index: 1050;
+        max-height: 220px;
+        overflow-y: auto;
+        margin: 0;
+        padding: 0;
+        display: none;
+        border: 1px solid #ddd;
+    }
+
+        .buscador-sugerencias li {
+            padding: 12px 18px;
+            color: #222;
+            list-style: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background .18s;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+            .buscador-sugerencias li:hover, .buscador-sugerencias li:focus {
+                background: #0d6efd;
+                color: #fff;
+            }
+
+            .buscador-sugerencias li:last-child {
+                border-bottom: none;
+            }
+</style>
+
+@section Scripts {
+    <script>
+        const vehiculos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(vehiculos.Select(v => new { id = v.Id, nombre = v.Marca + " " + v.Modelo + " " + v.Categoria })));
+        const input = document.getElementById('buscadorVehiculos');
+        const sugerencias = document.getElementById('sugerenciasVehiculos');
+
+        input.addEventListener('input', () => {
+            const query = input.value.trim().toLowerCase();
+            sugerencias.innerHTML = '';
+            if (!query) {
+                sugerencias.style.display = 'none';
+                return;
+            }
+            const matches = vehiculos.filter(v => v.nombre.toLowerCase().includes(query));
+            if (matches.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No se encontraron vehículos.';
+                li.classList.add('text-muted');
+                sugerencias.appendChild(li);
+            } else {
+                matches.forEach(m => {
+                    const li = document.createElement('li');
+                    li.textContent = m.nombre;
+                    li.onclick = () => {
+                        location.href = `/Vehiculos/Details/${m.id}`;
+                    };
+                    sugerencias.appendChild(li);
+                });
+            }
+            sugerencias.style.display = 'block';
+        });
+
+        input.addEventListener('blur', () => {
+            setTimeout(() => { sugerencias.style.display = 'none'; }, 150);
+        });
+    </script>
+}

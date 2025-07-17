@@ -151,19 +151,19 @@
                                         @if (isAdmin)
                                         {
                                             <div class="mb-1">Estado: @v.Estado</div>
-
                                         }
                                     </div>
+                                    <!-- BOTÓN DENTRO de card-body, mt-auto lo pega abajo -->
+                                    <a asp-controller="Alquileres"
+                                       asp-action="Create"
+                                       asp-route-idVehiculo="@v.Id"
+                                       class="btn btn-success mt-3 w-100">
+                                        Reservar
+                                    </a>
                                 </div>
                             </div>
-                            <a asp-controller="Alquileres"
-                               asp-action="Create"
-                               asp-route-idVehiculo="@v.Id"
-                               class="btn btn-success mt-2 w-100">
-                                Reservar
-                            </a>
-
                         </div>
+
                     }
                 }
                 else
